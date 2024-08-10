@@ -1,0 +1,46 @@
+module Decoder (op_code,rd_offset,rs_offset,rt_offset,shamt,const,Address,Instr);
+    output reg [3:0] op_code;
+    output reg [2:0] rd_offset,rs_offset,rt_offset,shamt;
+    output reg [5:0] const;
+    output reg [7:0] Address;
+    input [15:0] Instr;
+    
+    always@(Instr)
+    begin
+      op_code=Instr[15:12];
+      if (op_code==0 | op_code==3 | op_code==4)								// FOR ADD
+         begin
+        rd_offset=Instr[11:9];
+        rs_offset=Instr[8:6];
+        rt_offset=Instr[5:3];
+        shamt=Instr[2:0];
+         end
+   else if((op_code==1)|(op_code==2))			// FOR SLL AND SRL COMMANDS
+      begin
+        rd_offset=Instr[11:9];
+        rs_offset=Instr[8:6];
+        rt_offset=0;
+			shamt=Instr[2:0];
+         end
+      else if((op_code==5)|(op_code==7)|(op_code==8))				//FOR ADDI,LI AND LW
+         begin
+        rd_offset=Instr[11:9];
+        rs_offset=Instr[8:6];
+        const=Instr[5:0];
+         end
+      else if(op_code==6)			// FOR SW
+         begin
+        rd_offset=Instr[11:9];
+        const=Instr[5:0];
+         end
+      else if(op_code==9) begin
+        Address=Instr[11:4];
+      end
+		else		//Validation
+		begin
+		  rd_offset=0;
+        rs_offset=0;
+        rt_offset=0;
+		 end
+		end
+endmodule

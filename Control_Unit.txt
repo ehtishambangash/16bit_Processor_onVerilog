@@ -1,0 +1,51 @@
+module ControlUnit(clk,rst);
+input clk,rst;
+reg [15:0] instr,outreg;
+reg [7:0] PC;
+reg [3:0] op_code;
+reg [2:0] rd_offset,rs_offset,rt_offset,shamt;
+reg [5:0] CONST;
+reg [7:0] Address;
+
+reg [15:0] ROM [15:0];
+initial
+begin
+  ROM[0]=16'b0001011000000000;
+  ROM[1]=16'b0001000011010101;
+  ROM[2]=16'b0010000011010101;
+  ROM[3]=16'b0011000111010001;
+  ROM[4]=16'b0100000110001100;
+  ROM[5]=16'b0101000011111000;
+  ROM[6]=16'b0110000000010111;
+  ROM[7]=16'b0111000000000001;
+  ROM[8]=16'b1000000000000010;
+  ROM[9]=16'b1001011101110000;
+  ROM[10]=16'b0000000000000000;
+  ROM[11]=16'b0000000000000000;
+  ROM[12]=16'b0000000000000000;
+  ROM[13]=16'b0000000000000000;
+  ROM[14]=16'b0000000000000000;
+  ROM[15]=16'b0000000000000000;
+end
+
+always@(posedge clk)
+begin
+  instr=ROM[PC];
+end
+
+Decoder object1(op_code,rd_offset,rs_offset,rt_offset,shamt,CONST,Address,instr);
+
+always@(posedge clk,posedge rst)
+begin
+  if(rst==1)
+    begin
+    PC=0;
+  end
+  else if (op_code == 9)
+  PC=PC + Address;
+  else
+   PC = PC + 1;
+end
+ 
+DATAPATH object2(op_code,rd_offset,rs_offset,rt_offset,shamt,CONST,clk,outreg);
+endmodule
